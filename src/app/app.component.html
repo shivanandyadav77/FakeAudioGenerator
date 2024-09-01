@@ -1,0 +1,156 @@
+<div class="container">
+
+    <div class="button-group">
+        <button
+        class="start-button"
+        *ngIf="!isAudioRecording && !audioBlobUrl"
+        (click)="startAudioRecording()"
+      >
+        Start Audio Recording
+      </button>
+      <button
+        class="stop-button"
+        *ngIf="isAudioRecording && !audioBlobUrl"
+        (click)="stopAudioRecording()"
+      >
+        Stop Audio Recording
+      </button>
+      <button
+        class="cancel-button"
+        *ngIf="!isAudioRecording && audioBlobUrl"
+        (click)="clearAudioRecordedData()"
+      >
+        Clear Audio Recording
+      </button>
+    </div>
+    <div class="button-group">
+        <div id="audioTimer" *ngIf="isAudioRecording && !audioBlobUrl">
+            {{ audioRecordedTime }}
+          </div>
+          <audio *ngIf="!isAudioRecording && audioBlobUrl" controls>
+            <source [src]="audioBlobUrl" type="audio/mp3" />
+          </audio>
+        
+          <button
+          class="download-button"
+          *ngIf="!isAudioRecording && audioBlobUrl"
+          (click)="downloadAudioRecordedData()"
+        >
+          Download Audio Recording
+        </button>
+      </div>
+  <!-- Textbox -->
+  <div class="form-group">
+    <label for="inputText">Enter Text:</label>
+    <textarea class="form-control" [(ngModel)]="inputValue" name="txtName" mdInput placeholder="Comments" rows="3"></textarea>
+   
+  </div>
+
+  <!-- Combobox -->
+  <div class="button-group">
+
+    <div class="form-group">
+      <label for="comboBox">Select an Encoder:</label>
+      <select
+        id="Encoder"
+        class="form-control"
+        [(ngModel)]="selectedEncoder"
+      >
+        <option *ngFor="let option of EncoderValues" [value]="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+        <label for="comboBox">Select an Synthesizer:</label>
+        <select
+          id="Synthesizer"
+          class="form-control"
+          [(ngModel)]="selectedSynthesizer"
+        >
+          <option *ngFor="let option of SynthesizerValues" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+    </div>
+    <div class="form-group">
+    <label for="comboBox">Select an Vocoder:</label>
+    <select
+      id="Vocoder"
+      class="form-control"
+      [(ngModel)]="selectedVocoder"
+    >
+      <option *ngFor="let option of VocoderValues" [value]="option">
+        {{ option }}
+      </option>
+    </select>
+    </div>
+
+
+  </div>
+
+  
+  <div class="button-group">
+      <div class="form-group">
+        <label>
+          <input type="checkbox" class="checkbox" [(ngModel)]="chkRandomseeds">
+          Seed:
+        </label>
+      </div>
+      <div class="form-group">         
+          <input id="textbox" type="number" class="textbox" [(ngModel)]="txtRandomseed" (keypress)="validateInput($event)">
+        </div>
+      <div class="form-group">
+          <label>
+            <input type="checkbox" class="checkbox" [(ngModel)]="chkEnhancevocoderoutput">
+            Enhance vocoder output
+          </label>
+        </div>
+
+  </div>
+
+  <!-- Buttons -->
+  <div class="button-group">
+    <button
+      class="btn btn-secondary"
+      (click)="SynthesizeAndVocoder()"
+    >
+      Synthesize and Vocoder 
+    </button>
+    <button
+      class="btn btn-secondary"
+      (click)="SynthesizeOnly()"
+    >
+    Synthesize only
+    </button>
+
+    <button    
+    class="btn btn-secondary"
+    (click)="VocoderOnly()">
+      Vocoder  only
+  </button>
+  </div>
+
+  <div class="button-group">
+      <button
+  
+      class="download-button"
+      *ngIf="fakeaudioUrl"
+      (click)="playAudio()"
+    >
+      Play Fake Audio 
+    </button>
+    <audio *ngIf="fakeaudioUrl" controls>
+      <source [src]="fakeaudioUrl" type="audio/wav" />
+    </audio>
+    <button
+    class="download-button"
+    *ngIf="fakeaudioUrl"
+    (click)="downloadFakeAudioRecordedData()"
+  >
+    Download Fake Audio Recording
+  </button>
+
+  </div>
+</div>
