@@ -53,4 +53,4 @@ jobs:
           app-name: 'FakeAudioGenerator'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9949A7729C714B5A8B6E0C8A19578325 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1FFD4E53257944A1BBC74150B526ABFC }}
