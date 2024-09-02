@@ -53,4 +53,4 @@ jobs:
           app-name: 'AudioGeneratorApp'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_76932B7D0AE644B29F7BB1D3A16459A3 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9DD1B34BC6C14CB2BB01A1B37A3DDC19 }}
