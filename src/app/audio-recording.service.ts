@@ -4,6 +4,8 @@ import RecordRTC from 'recordrtc';
 import moment from 'moment';
 import { Observable, Subject } from 'rxjs';
 
+import { DomSanitizer } from '@angular/platform-browser';
+import { HttpClient,HttpHeaders ,HttpParams} from '@angular/common/http';
 
 interface RecordedAudioOutput {
   blob: Blob;
@@ -14,7 +16,7 @@ interface RecordedAudioOutput {
   providedIn: 'root'
 })
 export class AudioRecordingService {
-  constructor() { }
+  
   private stream;
   private recorder;
   private interval;
@@ -22,6 +24,38 @@ export class AudioRecordingService {
   private _recorded = new Subject<RecordedAudioOutput>();
   private _recordingTime = new Subject<string>();
   private _recordingFailed = new Subject<string>();
+  fakeaudioUrl:any
+  
+  CloneAudioChanged = new Subject<any>();
+
+
+  constructor(
+    private http: HttpClient,
+    private sanitizer: DomSanitizer
+  ) {}
+  setCloneAudioChanged(pData:any){
+    this.CloneAudioChanged.next(pData);
+  }
+
+GetClonedAudio(CONFIG:any,postPayload:any) 
+{ 
+  let header = new HttpHeaders();
+  header = header.append('Content-Type', 'application/json');
+  header = header.append('Accept' , 'text/plain');
+ header = header.append('Access-Control-Allow-Origin' , '*');
+  header = header.append('Accept','Access-Control-Allow-Origin');
+  header = header.append('Connection','Keep-Alive');
+  header = header.append('Accept','Connection');
+  header = header.append('Keep-Alive','timeout=15000, max=150000');
+  header = header.append('Accept','Keep-Alive');
+
+  
+  this.http.post<any>(CONFIG.apiURL, postPayload,{headers:header,responseType:'blob' as 'json' })
+  .subscribe(data => {
+     this.setCloneAudioChanged(data)
+  });
+
+}
 
 
   getRecordedBlob(): Observable<RecordedAudioOutput> {

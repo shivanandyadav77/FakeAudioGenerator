@@ -98,7 +98,7 @@
           Seed:
         </label>
       </div>
-      <div class="form-group">         
+      <div class="form-group" *ngIf="chkRandomseeds">         
           <input id="textbox" type="number" class="textbox" [(ngModel)]="txtRandomseed" (keypress)="validateInput($event)">
         </div>
       <div class="form-group">
@@ -111,7 +111,7 @@
   </div>
 
   <!-- Buttons -->
-  <div class="button-group">
+  <div class="button-group"  *ngIf="!isAudioRecording && audioBlobUrl">
     <button
       class="btn btn-secondary"
       (click)="SynthesizeAndVocoder()"

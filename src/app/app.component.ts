@@ -7,10 +7,9 @@ import {
 } from '@angular/core';
 import { AudioRecordingService } from './audio-recording.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { HttpClient,HttpHeaders ,HttpParams} from '@angular/common/http';
 import RecordRTC from 'recordrtc';
-// import { resolve } from 'q';
 import { CONFIG } from './app.config'
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -52,10 +51,11 @@ export class AppComponent implements OnDestroy {
   audioStream;
   audioConf = { audio: true };
   blobData:any
-  
+  onAudioClonedSubscription: Subscription; 
+
 
   constructor(
-    private http: HttpClient,
+   
     private ref: ChangeDetectorRef,
     private audioRecordingService: AudioRecordingService,
     private sanitizer: DomSanitizer
@@ -66,7 +66,9 @@ export class AppComponent implements OnDestroy {
       this.isAudioRecording = false;
       this.ref.detectChanges();
     });
+  
 
+    
     this.audioRecordingService.getRecordedTime().subscribe((time) => {
       this.audioRecordedTime = time;
       this.ref.detectChanges();
@@ -82,7 +84,17 @@ export class AppComponent implements OnDestroy {
     });
   }
 
-  ngOnInit() {}
+
+  ngOnInit() 
+  {
+
+  this.onAudioClonedSubscription = this.audioRecordingService.CloneAudioChanged.subscribe(
+    (data:any) => {
+       this.audioBlobUrl_data=data
+     this.fakeaudioUrl = URL.createObjectURL(data);     
+    }); //end of getting image data.    
+}
+
 
   validateInput(event: KeyboardEvent) {
     const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'];
@@ -150,20 +162,20 @@ export class AppComponent implements OnDestroy {
 
   }
 
-  async FormatInputValues(data: any, type: string, synthesizeAndVocoder: string,synthesizeonly: string,vocodereonly: string){
+  async ConvertBlogTemp(blob:any){
+    await this.ConvertBlobToBase64(blob);
 
-    let header = new HttpHeaders();
-    header = header.append('Content-Type', 'application/json');
-    header = header.append('Accept' , 'text/plain');
-   header = header.append('Access-Control-Allow-Origin' , '*');
-    header = header.append('Accept','Access-Control-Allow-Origin');
+  }
+
+   FormatInputValues(data: any, type: string, synthesizeAndVocoder: string,synthesizeonly: string,vocodereonly: string){
+
+   
     const blob = new Blob([data], { type: type });
 
-    await this.ConvertBlobToBase64(blob);
+     this.ConvertBlogTemp(blob);
 
     this.ConvertBlobToBase64(blob).then((base64data)=>{
       this.base64string=base64data
-     
     }).catch((error)=>{
     console.error(error);
     });
@@ -172,7 +184,7 @@ export class AppComponent implements OnDestroy {
     let postPayload={
       "audio":this.base64string.replace(/(?:\\[rn])+/g,""),
       "txtValue": this.inputValue,
-      "Randomseeds": this.chkRandomseeds,     
+      "Randomseeds": this.txtRandomseed,     
       "Enhancevocoderoutput": this.chkEnhancevocoderoutput,
       "Vocoder":this.selectedVocoder,
       "Encoder":this.selectedEncoder,
@@ -181,13 +193,16 @@ export class AppComponent implements OnDestroy {
       "Synthesizeronly":synthesizeonly,
       "Vocoderonly":vocodereonly
     }
+
+    this.audioRecordingService.GetClonedAudio(CONFIG,postPayload)
+
     // let baseURL: string = CONFIG.apiURL;
     // console.log(JSON.stringify(postPayload))
-    this.http.post<any>(CONFIG.apiURL, postPayload,{headers:header,responseType:'blob' as 'json' })
-    .subscribe(data => {
-      this.audioBlobUrl_data=data
-       this.fakeaudioUrl = URL.createObjectURL(data);
-    });
+    // this.http.post<any>(CONFIG.apiURL, postPayload,{headers:header,responseType:'blob' as 'json' })
+    // .subscribe(data => {
+    //   this.audioBlobUrl_data=data
+    //    this.fakeaudioUrl = URL.createObjectURL(data);
+    // });
 
   }
 
