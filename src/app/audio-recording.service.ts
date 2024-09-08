@@ -53,7 +53,13 @@ GetClonedAudio(CONFIG:any,postPayload:any)
   this.http.post<any>(CONFIG.apiURL, postPayload,{headers:header,responseType:'blob' as 'json' })
   .subscribe(data => {
      this.setCloneAudioChanged(data)
+  },
+  (error) => {     
+    console.log("----Shivaand----------------")                         //Error callback
+    this.setCloneAudioChanged(null)
   });
+  
+  
 
 }
 

@@ -27,16 +27,17 @@ export class AppComponent implements OnDestroy {
   txtRandomseed:number | null = null;
   chkEnhancevocoderoutput: boolean = false;
 
-  selectedVocoder:string = '';
+  selectedVocoder:string = 'default';
   VocoderValues:string[] = ['default','Griffin-Lim'];
 
-  selectedEncoder:string = '';
+  selectedEncoder:string = 'default';
   EncoderValues:string[] = ['default'];
 
-  selectedSynthesizer:string = '';
+  selectedSynthesizer:string = 'default';
   SynthesizerValues:string[] = ['default'];
 
 
+  progressbar=false
   playFakeAudio:any
   base64string:any
   isPlaying = false;
@@ -53,6 +54,8 @@ export class AppComponent implements OnDestroy {
   blobData:any
   onAudioClonedSubscription: Subscription; 
 
+  ActionEnableDisable=false
+
 
   constructor(
    
@@ -64,6 +67,7 @@ export class AppComponent implements OnDestroy {
     this.playFakeAudio=true
     this.audioRecordingService.recordingFailed().subscribe(() => {
       this.isAudioRecording = false;
+      this.ActionEnableDisable=true
       this.ref.detectChanges();
     });
   
@@ -87,9 +91,11 @@ export class AppComponent implements OnDestroy {
 
   ngOnInit() 
   {
-
+    this.progressbar=false
   this.onAudioClonedSubscription = this.audioRecordingService.CloneAudioChanged.subscribe(
     (data:any) => {
+      this.progressbar=false
+      this.ActionEnableDisable=true
        this.audioBlobUrl_data=data
      this.fakeaudioUrl = URL.createObjectURL(data);     
     }); //end of getting image data.    
@@ -107,6 +113,7 @@ export class AppComponent implements OnDestroy {
   startAudioRecording() {
     if (!this.isAudioRecording) {
       this.isAudioRecording = true;
+      this.ActionEnableDisable=false
       this.playFakeAudio=false
       this.audioRecordingService.startRecording();
     }
@@ -115,6 +122,7 @@ export class AppComponent implements OnDestroy {
   abortAudioRecording() {
     if (this.isAudioRecording) {
       this.isAudioRecording = false;
+      this.ActionEnableDisable=false
       this.playFakeAudio=false
       this.audioRecordingService.abortRecording();
     }
@@ -124,6 +132,7 @@ export class AppComponent implements OnDestroy {
     if (this.isAudioRecording) {
       this.audioRecordingService.stopRecording();
       this.isAudioRecording = false;
+      this.ActionEnableDisable=true
       this.playFakeAudio=false
     }
   }
@@ -181,10 +190,18 @@ export class AppComponent implements OnDestroy {
     });
 
     this.base64string=this.base64string.replace('data:audio/mp3;base64,','')
+    let txtSeedValue=""
+    if (this.chkRandomseeds==true)
+    {
+      txtSeedValue=this.txtRandomseed.toString()
+
+    }else{
+      txtSeedValue=null
+    }
     let postPayload={
       "audio":this.base64string.replace(/(?:\\[rn])+/g,""),
       "txtValue": this.inputValue,
-      "Randomseeds": this.txtRandomseed,     
+      "Randomseeds": txtSeedValue,     
       "Enhancevocoderoutput": this.chkEnhancevocoderoutput,
       "Vocoder":this.selectedVocoder,
       "Encoder":this.selectedEncoder,
@@ -193,6 +210,9 @@ export class AppComponent implements OnDestroy {
       "Synthesizeronly":synthesizeonly,
       "Vocoderonly":vocodereonly
     }
+
+    this.ActionEnableDisable=false
+    this.progressbar=true
 
     this.audioRecordingService.GetClonedAudio(CONFIG,postPayload)
 

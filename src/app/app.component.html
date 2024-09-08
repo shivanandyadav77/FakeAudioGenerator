@@ -1,6 +1,8 @@
 <div class="container">
-
+  
+    
     <div class="button-group">
+     
         <button
         class="start-button"
         *ngIf="!isAudioRecording && !audioBlobUrl"
@@ -110,8 +112,13 @@
 
   </div>
 
+  <div class="progess_bar">
+  <mat-progress-bar mode="indeterminate" value="10" *ngIf="progressbar" ></mat-progress-bar>
+</div>
+
+  
   <!-- Buttons -->
-  <div class="button-group"  *ngIf="!isAudioRecording && audioBlobUrl">
+  <div class="button-group"  *ngIf="ActionEnableDisable && audioBlobUrl">
     <button
       class="btn btn-secondary"
       (click)="SynthesizeAndVocoder()"
