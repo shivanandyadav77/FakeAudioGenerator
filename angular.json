@@ -23,9 +23,10 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/fake-audio-generators",
-            "index": "src/index.html",
+            "outputPath": "dist",
             "browser": "src/main.ts",
+            "index": "src/index.html",
+           
             "polyfills": [
               "zone.js"
             ],
