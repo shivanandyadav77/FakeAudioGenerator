@@ -1,8 +1,12 @@
 <div class="container">
   
+  <!-- <div class="audio-browser">
+    <h2>Browse and Play Audio File</h2>
+    <input type="file" (change)="onFileSelected($event)" accept="audio/*" />
+  </div> -->
     
     <div class="button-group">
-     
+      <input type="file" (change)="onFileSelected($event)" accept="audio/*" />
         <button
         class="start-button"
         *ngIf="!isAudioRecording && !audioBlobUrl"
@@ -44,7 +48,7 @@
   <!-- Textbox -->
   <div class="form-group">
     <label for="inputText">Enter Text:</label>
-    <textarea class="form-control" [(ngModel)]="inputValue" name="txtName" mdInput placeholder="Comments" rows="3"></textarea>
+    <textarea class="multitext" [(ngModel)]="inputValue" name="txtName" mdInput placeholder="Comments" rows="3"></textarea>
    
   </div>
 

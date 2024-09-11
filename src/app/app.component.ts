@@ -79,12 +79,29 @@ export class AppComponent implements OnDestroy {
     });
 
     this.audioRecordingService.getRecordedBlob().subscribe((data) => {
-      this.audioBlob = data.blob;
-      this.audioName = data.title;
-      this.audioBlobUrl = this.sanitizer.bypassSecurityTrustUrl(
-        URL.createObjectURL(data.blob)
-      );
-      this.ref.detectChanges();
+
+
+    const blobData = new Blob([data.blob], { type:'audio/mp3'  });
+    this.ConvertBlobToBase64(data.blob).then((base64data)=>{
+    this.base64string=base64data.split(",")[1]
+
+    // console.log("-----"+this.base64string)
+
+    this.audioBlob = data.blob;
+    this.audioName = data.title;
+    this.audioBlobUrl = this.sanitizer.bypassSecurityTrustUrl(
+      URL.createObjectURL(data.blob)
+    );
+    this.ref.detectChanges();
+    // this.base64string=this.base64string.replace('data:audio/mp3;base64,','')
+    // this.base64string=  this.base64string.replace(/(?:\\[rn])+/g,"")
+
+    }).catch((error)=>{
+    console.error(error);
+    });
+
+
+     
     });
   }
 
@@ -101,6 +118,32 @@ export class AppComponent implements OnDestroy {
     }); //end of getting image data.    
 }
 
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    if (file.type.startsWith('audio/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+         this.base64string = (reader.result as string).split(',')[1];
+        this.audioBlob = reader.result;
+        this.isAudioRecording = false;
+        this.ActionEnableDisable=true
+        this.playFakeAudio=false
+        this.audioBlobUrl=this.audioBlob
+        console.log( this.audioBlob)
+        // this.audioBlobUrl = this.sanitizer.bypassSecurityTrustUrl(
+        //   URL.createObjectURL(reader.result)
+        // );
+      };
+
+      reader.readAsDataURL(file);  // Read the file as Data URL for the audio element
+    } else {
+      alert('Please select a valid audio file.');
+    }
+  }
+ 
+}
 
   validateInput(event: KeyboardEvent) {
     const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'];
@@ -139,6 +182,8 @@ export class AppComponent implements OnDestroy {
 
   clearAudioRecordedData() {
     this.audioBlobUrl = null;
+    this.ActionEnableDisable=false
+    this.fakeaudioUrl=false
   }
 
   downloadAudioRecordedData() {
@@ -160,7 +205,7 @@ export class AppComponent implements OnDestroy {
 
   SynthesizeAndVocoder()
   {
-    this.FormatInputValues(this.audioBlob, 'audio/mp3',"Yes","No","No");
+    this.FormatInputValues(this.audioBlob, 'audio/x-m4a',"Yes","No","No");
   }
   SynthesizeOnly(){
     this.FormatInputValues(this.audioBlob, 'audio/mp3',"No","Yes","No");
@@ -179,17 +224,16 @@ export class AppComponent implements OnDestroy {
    FormatInputValues(data: any, type: string, synthesizeAndVocoder: string,synthesizeonly: string,vocodereonly: string){
 
    
-    const blob = new Blob([data], { type: type });
 
-     this.ConvertBlogTemp(blob);
+    // const blob = new Blob([data], { type: type });
 
-    this.ConvertBlobToBase64(blob).then((base64data)=>{
-      this.base64string=base64data
-    }).catch((error)=>{
-    console.error(error);
-    });
+    // //  this.ConvertBlogTemp(blob);
 
-    this.base64string=this.base64string.replace('data:audio/mp3;base64,','')
+    // this.ConvertBlobToBase64(blob).then((base64data)=>{
+    //   this.base64string=base64data
+
+    // this.base64string=this.base64string.replace('data:audio/mp3;base64,','')
+    // this.base64string=this.base64string.replace('data:audio/x-m4a;base64,','')
     let txtSeedValue=""
     if (this.chkRandomseeds==true)
     {
@@ -198,8 +242,9 @@ export class AppComponent implements OnDestroy {
     }else{
       txtSeedValue=null
     }
+   
     let postPayload={
-      "audio":this.base64string.replace(/(?:\\[rn])+/g,""),
+      "audio":this.base64string,
       "txtValue": this.inputValue,
       "Randomseeds": txtSeedValue,     
       "Enhancevocoderoutput": this.chkEnhancevocoderoutput,
@@ -216,13 +261,14 @@ export class AppComponent implements OnDestroy {
 
     this.audioRecordingService.GetClonedAudio(CONFIG,postPayload)
 
-    // let baseURL: string = CONFIG.apiURL;
-    // console.log(JSON.stringify(postPayload))
-    // this.http.post<any>(CONFIG.apiURL, postPayload,{headers:header,responseType:'blob' as 'json' })
-    // .subscribe(data => {
-    //   this.audioBlobUrl_data=data
-    //    this.fakeaudioUrl = URL.createObjectURL(data);
+
+
+    // }).catch((error)=>{
+    // console.error(error);
     // });
+
+    
+  
 
   }
 

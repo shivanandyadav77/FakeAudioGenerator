@@ -55,7 +55,7 @@ GetClonedAudio(CONFIG:any,postPayload:any)
      this.setCloneAudioChanged(data)
   },
   (error) => {     
-    console.log("----Shivaand----------------")                         //Error callback
+                           //Error callback
     this.setCloneAudioChanged(null)
   });
   
@@ -138,7 +138,9 @@ GetClonedAudio(CONFIG:any,postPayload:any)
               'audio_' + new Date().getTime() + '.mp3'
             );
             this.stopMedia();
-            this._recorded.next({ blob: blob, title: mp3Name });
+            this._recorded.next({ 
+              blob: blob, 
+              title: mp3Name });
           }
         },
         () => {
